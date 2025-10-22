@@ -1,0 +1,35 @@
+# Model Configuration
+model:
+  type: "pytorch"  # Options: "pytorch", "llm"
+  input_size: 10
+  hidden_size: 64
+  output_size: 1
+  dropout: 0.2
+  learning_rate: 0.001
+
+# Training Configuration
+training:
+  max_epochs: 10
+  batch_size: 32
+  early_stopping_patience: 5
+  validation_split: 0.2
+  test_split: 0.1
+
+# Data Configuration
+data:
+  loader_type: "local"  # Options: "local", "feature_store"
+  file_path: "/data/training_data.csv"
+  file_format: "csv"  # Options: "csv", "parquet", "json"
+  feature_columns: ["feature_1", "feature_2", "feature_3", "feature_4", "feature_5", "feature_6", "feature_7", "feature_8", "feature_9", "feature_10"]
+  target_column: "target"
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  shuffle: true
+
+# MLflow Configuration
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "mlops-training"
+  model_name: "my-model"
+  model_stage: "Staging"
