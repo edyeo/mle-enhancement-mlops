@@ -1,0 +1,50 @@
+# Database Configuration
+database:
+  host: "localhost"
+  port: 5432
+  database: "mlops"
+  username: "postgres"
+  password: ""
+  # Use either query or table_name
+  query: "SELECT * FROM training_data WHERE created_at >= '2024-01-01'"
+  # table_name: "training_data"
+
+# Preprocessing Configuration
+preprocessing:
+  feature_columns: ["feature_1", "feature_2", "feature_3", "feature_4", "feature_5", "feature_6", "feature_7", "feature_8", "feature_9", "feature_10"]
+  target_column: "target"
+  scale_features: true
+  encode_categorical: true
+  missing_strategy: "drop"  # Options: "drop", "fill_mean", "fill_median"
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+
+# Model Configuration
+model:
+  type: "pytorch"
+  input_size: 10
+  hidden_size: 64
+  output_size: 1
+  dropout: 0.2
+  learning_rate: 0.001
+
+# Training Configuration
+training:
+  max_epochs: 10
+  batch_size: 32
+  early_stopping_patience: 5
+  save_checkpoints: true
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["mse", "mae", "r2", "rmse"]  # For regression
+  # metrics: ["accuracy", "precision", "recall", "f1"]  # For classification
+  threshold: 0.5  # For classification
+
+# MLflow Configuration
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "mlops-training"
+  model_name: "my-model"
+  model_stage: "Staging"
