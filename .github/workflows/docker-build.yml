@@ -1,0 +1,68 @@
+name: Build and Push Docker Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      endpoint_tag:
+        description: 'Endpoint image tag (default: latest)'
+        required: false
+        default: 'latest'
+        type: string
+      pipeline_tag:
+        description: 'Pipeline image tag (default: latest)'
+        required: false
+        default: 'latest'
+        type: string
+      registry_host:
+        description: 'Docker registry host (default: localhost:65000)'
+        required: false
+        default: 'localhost:65000'
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build and push Endpoint API image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./endpoint
+        file: ./endpoint/Dockerfile
+        push: true
+        tags: |
+          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-endpoint:${{ github.sha }}
+          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-endpoint:${{ github.event.inputs.endpoint_tag || 'latest' }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build and push ML Pipeline image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ml-pipeline
+        file: ./ml-pipeline/docker/Dockerfile
+        push: true
+        tags: |
+          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-pipeline:${{ github.sha }}
+          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-pipeline:${{ github.event.inputs.pipeline_tag || 'latest' }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Verify images in registry
+      run: |
+        echo "Verifying images in registry..."
+        curl -s http://${{ github.event.inputs.registry_host || 'localhost:65000' }}/v2/_catalog | jq .
+        
+    - name: Summary
+      run: |
+        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Endpoint Image**: ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-endpoint:${{ github.event.inputs.endpoint_tag || 'latest' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Pipeline Image**: ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-pipeline:${{ github.event.inputs.pipeline_tag || 'latest' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit SHA**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Registry**: ${{ github.event.inputs.registry_host || 'localhost:65000' }}" >> $GITHUB_STEP_SUMMARY
