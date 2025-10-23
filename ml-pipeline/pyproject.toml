@@ -6,6 +6,10 @@ authors = [
     {name = "MLOps Team"}
 ]
 readme = "README.md"
+packages = [
+    {include = "ml_pipeline", from = "src"}
+]
+
 requires-python = ">=3.9,<3.12"
 dependencies = [
     "torch (==2.1.2)",
@@ -19,7 +23,6 @@ dependencies = [
     "pyyaml (==6.0.1)",
     "kfp (==2.4.0)",
 ]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

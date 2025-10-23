@@ -24,8 +24,8 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --without dev
 
 # Copy component code
-COPY components/ ./components/
-COPY config/ ./config/
+COPY src/ml_pipeline/components/ ./components/
+COPY src/ml_pipeline/config/ ./config/
 
 # Set environment variables
 ENV PYTHONPATH=/app
