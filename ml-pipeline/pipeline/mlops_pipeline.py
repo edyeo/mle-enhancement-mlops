@@ -6,17 +6,12 @@ from kfp import dsl
 from kfp.dsl import component, pipeline, Input, Output, Artifact, Model, Dataset
 from typing import NamedTuple
 
+from components.data_load.data_loader import DataLoader
+from components.train.model_trainer import ModelTrainer
+from components.evaluation.model_evaluator import ModelEvaluator
 
 @component(
-    base_image="python:3.9-slim",
-    packages_to_install=[
-        "pandas==2.1.4",
-        "psycopg2-binary==2.9.9",
-        "sqlalchemy==2.0.23",
-        "scikit-learn==1.3.2",
-        "pyyaml==6.0.1",
-        "numpy==1.24.3"
-    ]
+    base_image="localhost:65000/mlops-pipeline:latest"
 )
 def data_load_component(
     config_path: str,
@@ -33,7 +28,7 @@ def data_load_component(
     # Add the component path to sys.path
     sys.path.append('/components/data_load')
     
-    from data_loader import DataLoader
+
     
     # Configure logging
     logging.basicConfig(level=logging.INFO)
@@ -78,16 +73,7 @@ def data_load_component(
 
 
 @component(
-    base_image="python:3.9-slim",
-    packages_to_install=[
-        "torch==2.1.2",
-        "pytorch-lightning==2.1.3",
-        "mlflow==2.8.1",
-        "pandas==2.1.4",
-        "scikit-learn==1.3.2",
-        "pyyaml==6.0.1",
-        "numpy==1.24.3"
-    ]
+    base_image="localhost:65000/mlops-pipeline:latest"
 )
 def train_component(
     config_path: str,
@@ -103,9 +89,7 @@ def train_component(
     
     # Add the component path to sys.path
     sys.path.append('/components/train')
-    
-    from model_trainer import ModelTrainer
-    
+
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
@@ -140,15 +124,7 @@ def train_component(
 
 
 @component(
-    base_image="python:3.9-slim",
-    packages_to_install=[
-        "torch==2.1.2",
-        "mlflow==2.8.1",
-        "pandas==2.1.4",
-        "scikit-learn==1.3.2",
-        "pyyaml==6.0.1",
-        "numpy==1.24.3"
-    ]
+    base_image="localhost:65000/mlops-pipeline:latest"
 )
 def evaluation_component(
     config_path: str,
@@ -166,9 +142,7 @@ def evaluation_component(
     
     # Add the component path to sys.path
     sys.path.append('/components/evaluation')
-    
-    from model_evaluator import ModelEvaluator
-    
+
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)

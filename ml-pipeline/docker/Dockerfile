@@ -21,7 +21,7 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock ./
 
 # Install Python dependencies
-RUN poetry install --no-dev
+RUN poetry install --without dev
 
 # Copy component code
 COPY components/ ./components/

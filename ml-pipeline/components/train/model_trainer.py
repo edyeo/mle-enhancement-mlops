@@ -13,9 +13,10 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-import pytorch_lightning as pl
-from pytorch_lightning.loggers import MLflowLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+
+import lightning.pytorch as pl
+from lightning.pytorch.loggers import MLflowLogger
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 import mlflow
 import mlflow.pytorch
 
