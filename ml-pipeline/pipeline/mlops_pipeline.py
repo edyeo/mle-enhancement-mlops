@@ -238,14 +238,14 @@ def mlops_training_pipeline(
     # Model training step
     train_task = train_component(
         config_path=config_path,
-        data_path=data_load_task.outputs['data_path']
+        data_path=data_load_task.outputs['output_data']
     )
     
     # Model evaluation step
     evaluation_task = evaluation_component(
         config_path=config_path,
-        model_path=train_task.outputs['model_path'],
-        data_path=data_load_task.outputs['data_path']
+        model_path=train_task.outputs['output_model'],
+        data_path=data_load_task.outputs['output_data']
     )
     
     # Set dependencies

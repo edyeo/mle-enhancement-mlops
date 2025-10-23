@@ -170,8 +170,8 @@ class KubeflowPipelineRunner:
 def main():
     """메인 함수."""
     parser = argparse.ArgumentParser(description="Kubeflow MLOps Pipeline Runner")
-    parser.add_argument("--host", default="http://localhost:8080", 
-                       help="Kubeflow server host (default: http://localhost:8080)")
+    parser.add_argument("--host", default="http://localhost:43000", 
+                       help="Kubeflow server host (default: http://localhost:43000)")
     parser.add_argument("--action", choices=["compile", "submit", "status", "list-experiments", "list-runs"],
                        default="submit", help="Action to perform")
     parser.add_argument("--run-id", help="Run ID for status check")

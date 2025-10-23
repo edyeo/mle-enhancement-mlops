@@ -1,21 +1,27 @@
-# Use Python 3.9 slim image
-FROM python:3.9-slim
+# Use Python 3.11 slim image
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including poetry
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Install poetry
+RUN pip install poetry
+
+# Configure poetry
+RUN poetry config virtualenvs.create false
+
+# Copy poetry files first for better caching
+COPY pyproject.toml poetry.lock ./
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN poetry install --no-dev
 
 # Copy component code
 COPY components/ ./components/
