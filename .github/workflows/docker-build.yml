@@ -27,43 +27,31 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Configure Docker for HTTP registry
-      run: |
-        # Create Docker daemon config for insecure registry
-        sudo mkdir -p /etc/docker
-        echo '{"insecure-registries": ["localhost:65000"]}' | sudo tee /etc/docker/daemon.json
-        # Restart Docker daemon
-        sudo systemctl restart docker || true
-        # Wait for Docker to be ready
-        sleep 5
-        docker info
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
     - name: Build and push Endpoint API image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./endpoint
-        file: ./endpoint/Dockerfile
-        push: true
-        tags: |
-          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-endpoint:${{ github.sha }}
-          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-endpoint:${{ github.event.inputs.endpoint_tag || 'latest' }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      run: |
+        REGISTRY="${{ github.event.inputs.registry_host || 'localhost:65000' }}"
+        TAG="${{ github.event.inputs.endpoint_tag || 'latest' }}"
+        
+        # Build image
+        docker build -t $REGISTRY/mlops-endpoint:${{ github.sha }} -f endpoint/Dockerfile endpoint
+        docker tag $REGISTRY/mlops-endpoint:${{ github.sha }} $REGISTRY/mlops-endpoint:$TAG
+        
+        # Push with HTTP (no TLS verification)
+        docker push $REGISTRY/mlops-endpoint:${{ github.sha }}
+        docker push $REGISTRY/mlops-endpoint:$TAG
         
     - name: Build and push ML Pipeline image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./ml-pipeline
-        file: ./ml-pipeline/docker/Dockerfile
-        push: true
-        tags: |
-          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-pipeline:${{ github.sha }}
-          ${{ github.event.inputs.registry_host || 'localhost:65000' }}/mlops-pipeline:${{ github.event.inputs.pipeline_tag || 'latest' }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      run: |
+        REGISTRY="${{ github.event.inputs.registry_host || 'localhost:65000' }}"
+        TAG="${{ github.event.inputs.pipeline_tag || 'latest' }}"
+        
+        # Build image
+        docker build -t $REGISTRY/mlops-pipeline:${{ github.sha }} -f ml-pipeline/docker/Dockerfile ml-pipeline
+        docker tag $REGISTRY/mlops-pipeline:${{ github.sha }} $REGISTRY/mlops-pipeline:$TAG
+        
+        # Push with HTTP (no TLS verification)
+        docker push $REGISTRY/mlops-pipeline:${{ github.sha }}
+        docker push $REGISTRY/mlops-pipeline:$TAG
         
     - name: Verify images in registry
       run: |
